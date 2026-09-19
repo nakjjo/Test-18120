@@ -171,10 +171,7 @@
 
     <!-- 📍 1번 수정위치: [로딩 화면 HTML] -->
     <div id="loading-screen">
-        <!-- 💡 로딩 화면에 넣을 이미지파일명 (48번째 줄 부근) -->
         <img src="icecream.jpg" alt="로딩 이미지" class="loading-img">
-        
-        <!-- 💡 로딩 화면에 넣을 글씨 (52, 53번째 줄 부근) -->
         <div class="loading-title">당신의 아이스크림을 쌓아 올리는 중...</div>
         <div class="loading-sub">잠시만 기다려주세요!</div>
         
@@ -200,6 +197,8 @@
         <!-- 결과 페이지 -->
         <div id="result-page" class="page">
             <h1 id="result-title">결과 타이틀</h1>
+            <!-- 💡 결과 이미지 태그 추가 (오류 수정 지점) -->
+            <img id="result-img" class="result-img" src="" alt="결과 이미지">
             <p id="result-desc">결과 설명이 들어갑니다.</p>
             <button class="btn" onclick="restartTest()">다시 테스트하기</button>
         </div>
