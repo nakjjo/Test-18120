@@ -1,359 +1,341 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>성격 유형 테스트</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나는 어떤 아이스크림에 적합할까?</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-    body {
-      background-color: #fcfbf9; /* 따뜻한 느낌의 화이트 */
-      color: #333333;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
+        body {
+            background-color: #f7f7f8;
+            color: #333333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    /* 모바일 컨테이너 */
-    .app-container {
-      width: 100%;
-      max-width: 430px;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            padding: 30px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* 상단 진행 바 영역 */
-    .header {
-      margin-bottom: 30px;
-    }
+        /* ================================================= */
+        /* 📍 [로딩 화면 스타일]                              */
+        /* ================================================= */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
 
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      color: #8c8c8c;
-      font-size: 14px;
-    }
+        /* 📍 [로딩 화면 사진 크기 & 스타일] */
+        .loading-img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
 
-    .top-nav .title {
-      font-weight: 500;
-      color: #737373;
-    }
+        /* 📍 [로딩 화면 글씨 스타일] */
+        .loading-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #222222;
+            margin-bottom: 10px;
+        }
 
-    .top-nav .title span {
-      color: #8c6d53; /* 브라운 포인트 */
-      font-weight: 700;
-      margin-right: 4px;
-    }
+        .loading-sub {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 30px;
+        }
 
-    .progress-bar-bg {
-      width: 100%;
-      height: 6px;
-      background-color: #efebe7;
-      border-radius: 3px;
-      overflow: hidden;
-    }
+        /* 로딩 바 애니메이션 */
+        .progress-bar-container {
+            width: 200px;
+            height: 6px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
 
-    .progress-bar-fill {
-      width: 0%;
-      height: 100%;
-      background-color: #8c6d53;
-      border-radius: 3px;
-      transition: width 0.3s ease;
-    }
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background-color: #555555;
+            animation: fillProgress 3s linear forwards;
+        }
 
-    /* 메인 영역 */
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
 
-    .question-title {
-      text-align: center;
-      font-size: 19px;
-      font-weight: 600;
-      margin-bottom: 32px;
-      color: #2c2c2c;
-    }
+        /* ================================================= */
+        /* 메인 콘텐츠 & 결과 화면                           */
+        /* ================================================= */
+        .page {
+            display: none;
+        }
 
-    .question-title span {
-      color: #8c6d53;
-    }
+        .page.active {
+            display: block;
+        }
 
-    /* 선택지 버튼 카드 */
-    .option-card {
-      background-color: #ffffff;
-      border: 1.5px solid #e8e3df;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: flex-start;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      -webkit-tap-highlight-color: transparent;
-    }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #222222;
+        }
 
-    .option-card:active {
-      transform: scale(0.98);
-      border-color: #8c6d53;
-      background-color: #f7f4f0;
-    }
+        p {
+            font-size: 15px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
 
-    .option-badge {
-      background-color: #f2ebe5;
-      color: #6e543e;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 6px 11px;
-      border-radius: 8px;
-      margin-right: 14px;
-      flex-shrink: 0;
-    }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 16px;
+            background-color: #4a4a4a;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background-color 0.2s;
+        }
 
-    .option-text {
-      font-size: 15px;
-      line-height: 1.55;
-      color: #4a4a4a;
-      word-break: keep-all;
-    }
+        .btn:hover {
+            background-color: #333333;
+        }
 
-    /* 결과 페이지 스타일 */
-    .result-container {
-      text-align: center;
-      padding: 20px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-    }
+        .question-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #333333;
+        }
 
-    .result-sub {
-      font-size: 14px;
-      color: #8c6d53;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+        .option-btn {
+            background-color: #f8f9fa;
+            color: #333333;
+            border: 1px solid #e9ecef;
+            text-align: left;
+        }
 
-    .result-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #2c2c2c;
-      margin-bottom: 20px;
-    }
+        .option-btn:hover {
+            background-color: #f1f3f5;
+        }
 
-    .result-box {
-      background-color: #ffffff;
-      border: 1.5px solid #e8e3df;
-      border-radius: 16px;
-      padding: 24px 20px;
-      margin-bottom: 28px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-      text-align: left;
-    }
-
-    .result-desc {
-      font-size: 15px;
-      line-height: 1.6;
-      color: #4a4a4a;
-      word-break: keep-all;
-    }
-
-    .restart-btn {
-      width: 100%;
-      background-color: #8c6d53;
-      color: #ffffff;
-      border: none;
-      padding: 16px;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .restart-btn:active {
-      background-color: #6e543e;
-    }
-  </style>
+        .result-img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-container">
-    <!-- 상단 헤더 -->
-    <div id="header" class="header">
-      <div class="top-nav">
-        <div class="title">← <span>PHASE 1</span> 성격 특징 탐색</div>
-        <div id="step-counter">1/5</div>
-      </div>
-      <div class="progress-bar-bg">
-        <div id="progress-bar" class="progress-bar-fill"></div>
-      </div>
+    <!-- 📍 1번 수정위치: [로딩 화면 HTML] -->
+    <div id="loading-screen">
+        <!-- 💡 로딩 화면에 넣을 이미지파일명 (48번째 줄 부근) -->
+        <img src="icecream.png" alt="로딩 이미지" class="loading-img">
+        
+        <!-- 💡 로딩 화면에 넣을 글씨 (52, 53번째 줄 부근) -->
+        <div class="loading-title">당신의 아이스크림을 쌓아 올리는 중...</div>
+        <div class="loading-sub">잠시만 기다려주세요!</div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill"></div>
+        </div>
     </div>
 
-    <!-- 메인 질문 영역 -->
-    <div id="quiz-screen" class="content">
-      <div class="question-title">더 가까운 쪽을 <span>선택하세요</span></div>
+    <div class="container">
+        <!-- 시작 페이지 -->
+        <div id="start-page" class="page active">
+            <h1>나의 성격 유형 테스트</h1>
+            <p> 간단한 5가지 질문을 통해 알아보는<br>나만의 성격 유형!</p>
+            <button class="btn" onclick="startTest()">테스트 시작하기</button>
+        </div>
 
-      <div class="option-card" onclick="selectOption('A')">
-        <div class="option-badge">A</div>
-        <div id="option-a-text" class="option-text"></div>
-      </div>
+        <!-- 질문 페이지 -->
+        <div id="question-page" class="page">
+            <div class="question-title" id="question-text">질문 내용</div>
+            <div id="options-container"></div>
+        </div>
 
-      <div class="option-card" onclick="selectOption('B')">
-        <div class="option-badge">B</div>
-        <div id="option-b-text" class="option-text"></div>
-      </div>
+        <!-- 결과 페이지 -->
+        <div id="result-page" class="page">
+            <h1 id="result-title">결과 타이틀</h1>
+            <p id="result-desc">결과 설명이 들어갑니다.</p>
+            <button class="btn" onclick="restartTest()">다시 테스트하기</button>
+        </div>
     </div>
 
-    <!-- 결과 화면 영역 -->
-    <div id="result-screen" class="result-container" style="display: none;">
-      <div class="result-sub">당신의 성격 유형 결과</div>
-      <h2 id="result-type" class="result-title">결과 불러오는 중...</h2>
-      
-      <div class="result-box">
-        <p id="result-desc" class="result-desc"></p>
-      </div>
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500); // 서서히 사라지는 효과시간 (0.5초)
+            }, 3000); // 💡 3000 = 3초
+        });
 
-      <button class="restart-btn" onclick="restartQuiz()">다시 테스트하기</button>
-    </div>
-  </div>
+        // 테스트 데이터 및 로직
+        const questions = [
+            {
+                q: "1. 주말에 석회동굴에 가게되었습니다. 이때 당신이 할 행동은?",
+                a: [
+                    { text: "어두운 동굴 깊은 곳에 무엇이 있는지 직접 끝까지 가봐야 직성이 풀린다.", type: "A" },
+                    { text: "동굴에서 방문할 동선을 미리 계획한다.", type: "B" },
+                    { text: "우선 같이 갈 일행을 구한 뒤, 무엇을 할지 맞춰본다.", type: "C" }
+                ]
+            },
+            {
+                q: "2. 동굴 안에서 어디에서도 보지 못한 특이한 돌을 발견했을때 당신은?",
+                a: [
+                    { text: "특이한 돌은 지나칠 수 없다! 돌을 관찰한다", type: "A" },
+                    { text: "특이한 돌이 신기하지만 계획에 없던 일이다! 가볍게 눈으로 훑은 뒤 갈길을 간다.", type: "B" },
+                    { text: "우선 돌을 관찰한 뒤, 일행에게 더 구경할 것인지 물어본다.", type: "C" }
+                ]
+            },
+            {
+                q: "3. 동굴 안에서 갈림길을 만났을때 당신은?",
+                a: [
+                    { text: "더 흥미로운 쪽으로 고른다.", type: "A" },
+                    { text: "이미 갈림길에서 어디로 갈지 계획해놓아 결정할 필요가 없다.", type: "B" },
+                    { text: "일행에게 의견을 물어 어디로 갈지 결정해본다.", type: "C" }
+                ]
+            },
+            {
+                q: "4. 동굴에서 일행이 다른 곳을 보러가자고 하지만 당신은 현재 있는 곳이 마음에 듭니다. 이때 당신은?",
+                a: [
+                    { text: "여기가 마음에 든다며 조금만 더 보고 가자고 말해본다.", type: "A" },
+                    { text: "동굴의 경로를 확인하고 알겠다고 말한다.", type: "B" },
+                    { text: "이 곳이 마음에 들지만 일행이 가고싶은 곳도 좋을 것 같다! 흔쾌히 수락한다.", type: "C" }
+                ]
+            },
+            {
+                q: "5. 석회동굴에서 딱 한 장의 사진만 남길 수 있다면?",
+                a: [
+                    { text: "오늘 관람하며 가장 마음에 들었던 돌을 고른다.", type: "A" },
+                    { text: "이미 가장 마음에 드는 돌을 골라놓아 어디서 찍을지 쉽게 결정한다.", type: "B" },
+                    { text: "하나의 특이한 돌 보다 여러개의 돌이 함께있는 곳을 결정한다.", type: "C" }
+                ]
+            }
+        ];
 
-  <script>
-    // 1. 질문 데이터 5개 (타입별 점수 연결)
-    // typeA, typeB에 원하는 결과 유형 키(type1, type2, type3)를 할당합니다.
-    const questions = [
-      {
-        a: "계획을 꼼꼼하게 세우고 규칙적으로 움직이는 것이 편하다.",
-        b: "그때그때 기분과 상황에 따라 유연하게 행동하는 것이 좋다.",
-        typeA: "type1",
-        typeB: "type2"
-      },
-      {
-        a: "여러 사람과 함께 아이디어를 나누며 일할 때 활력이 생긴다.",
-        b: "조용한 공간에서 혼자 집중해서 일할 때 능률이 오른다.",
-        typeA: "type3",
-        typeB: "type1"
-      },
-      {
-        a: "감정이나 관계보다는 논리와 정확한 사실이 더 중요하다.",
-        b: "상대방의 기분과 마음을 배려하는 것이 무엇보다 중요하다.",
-        typeA: "type1",
-        typeB: "type3"
-      },
-      {
-        a: "새로운 도전을 즐기며 변화에 빠르게 적응하는 편이다.",
-        b: "익숙하고 안정적인 환경에서 마음의 평온을 느낀다.",
-        typeA: "type2",
-        typeB: "type3"
-      },
-      {
-        a: "문제가 생기면 직관과 경험에 따라 빠르게 결정을 내린다.",
-        b: "다양한 가능성을 열어두고 신중하게 고민한 뒤 결정한다.",
-        typeA: "type2",
-        typeB: "type1"
-      }
-    ];
+        const results = {
+            A: {
+                title: "당신의 아이스크림은 초코맛 종유석",
+                desc: "뾰족뾰족한 종유석과 같이 당신은 새로운 일에 망설임 없이 도전하는 편입니다. 호기심이 많고 과감하게 행동하는것에 거침없습니다.",
+                img: "result1.png"
+            },
+            B: {
+                title: "당신의 아이스크림은 흑임자맛 석순",
+                desc: "동굴 바닥의 바위나 흙에서 차곡차곡 자라나는 석순처럼 당신은 신중하고 꾸준한 성격을 가진편입니다. 서두르기보다는 차근차근 해내가며 자신의 속도대로 목표를 달성합니다.",
+                img: "result2.png"
+            },
+            C: {
+                title: "당신의 아이스크림은 얼그레이맛 석주",
+                desc: "위와 아래가 만나 하나의 기둥이 된 석주와 같이 당신은 균형과 조화를 중요하게 생각하는 편입니다. 자신의 의견을 소신있게 밀어가면서도 다른 사람의 의견 또한 존중하며 다양한 의견을 수용하려 노력합니다.",
+                img: "result3.png"
+            }
+        };
 
-    // 2. 3가지 결과 데이터
-    const results = {
-      type1: {
-        title: "신중한 완벽주의자 🦉",
-        desc: "당신은 체계적이고 계획적인 성향을 가지고 있습니다. 논리적이고 정확한 것을 선호하며, 한번 시작한 일은 책임감 있게 끝까지 해내는 강한 몰입력을 가지고 있습니다."
-      },
-      type2: {
-        title: "자유로운 모험가 🦊",
-        desc: "당신은 유연하고 창의적인 사고를 가진 사람입니다. 틀에 갇히기보다는 새로운 가능성을 탐색하는 것을 즐기며, 변화하는 상황에 빠르게 적응하는 순발력이 뛰어납니다."
-      },
-      type3: {
-        title: "따뜻한 공감가 🐶",
-        desc: "당신은 타인의 감정을 잘 이해하고 배려하는 따뜻한 마음을 가졌습니다. 주위 사람들과 조화로운 관계를 맺는 것을 중요하게 생각하며, 함께할 때 시너지를 발휘합니다."
-      }
-    };
+        let currentQ = 0;
+        let scores = { A: 0, B: 0, C: 0 };
 
-    let currentIndex = 0;
-    // 유형별 점수 집계 객체
-    let scores = { type1: 0, type2: 0, type3: 0 };
-
-    // 질문 로드 함수
-    function loadQuestion() {
-      if (currentIndex >= questions.length) {
-        showResult();
-        return;
-      }
-
-      const q = questions[currentIndex];
-      document.getElementById("option-a-text").innerText = q.a;
-      document.getElementById("option-b-text").innerText = q.b;
-      
-      // 진행 상황 카운트 & 프로그래스 바 업데이트
-      document.getElementById("step-counter").innerText = `${currentIndex + 1}/${questions.length}`;
-      const progressPercent = ((currentIndex + 1) / questions.length) * 100;
-      document.getElementById("progress-bar").style.width = `${progressPercent}%`;
-    }
-
-    // 선택 버튼 클릭 시 점수 누적
-    function selectOption(choice) {
-      const q = questions[currentIndex];
-      if (choice === 'A') {
-        scores[q.typeA]++;
-      } else {
-        scores[q.typeB]++;
-      }
-
-      currentIndex++;
-      loadQuestion();
-    }
-
-    // 가장 점수가 높은 결과를 도출하여 화면에 표시
-    function showResult() {
-      document.getElementById("quiz-screen").style.display = "none";
-      document.getElementById("header").style.display = "none"; // 진행바 숨김
-      document.getElementById("result-screen").style.display = "flex";
-
-      // 가장 점수가 높은 유형 찾기
-      let finalType = "type1";
-      let maxScore = -1;
-
-      for (const type in scores) {
-        if (scores[type] > maxScore) {
-          maxScore = scores[type];
-          finalType = type;
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
         }
-      }
 
-      // 결과 텍스트 적용
-      const resultData = results[finalType];
-      document.getElementById("result-type").innerText = resultData.title;
-      document.getElementById("result-desc").innerText = resultData.desc;
-    }
+        function startTest() {
+            currentQ = 0;
+            scores = { A: 0, B: 0, C: 0 };
+            showPage('question-page');
+            renderQuestion();
+        }
 
-    // 다시 시작하기
-    function restartQuiz() {
-      currentIndex = 0;
-      scores = { type1: 0, type2: 0, type3: 0 };
-      document.getElementById("quiz-screen").style.display = "flex";
-      document.getElementById("header").style.display = "block";
-      document.getElementById("result-screen").style.display = "none";
-      loadQuestion();
-    }
+        function renderQuestion() {
+            const qData = questions[currentQ];
+            document.getElementById('question-text').innerText = qData.q;
+            
+            const optionsBox = document.getElementById('options-container');
+            optionsBox.innerHTML = '';
 
-    // 초기 실행
-    loadQuestion();
-  </script>
+            qData.a.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => selectOption(opt.type);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function selectOption(type) {
+            scores[type]++;
+            currentQ++;
+
+            if (currentQ < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            let maxType = 'A';
+            if (scores.B > scores[maxType]) maxType = 'B';
+            if (scores.C > scores[maxType]) maxType = 'C';
+
+            const res = results[maxType];
+            document.getElementById('result-title').innerText = res.title;
+            document.getElementById('result-desc').innerText = res.desc;
+            document.getElementById('result-img').src = res.img;
+
+            showPage('result-page');
+        }
+
+        function restartTest() {
+            showPage('start-page');
+        }
+    </script>
 </body>
 </html>
