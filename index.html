@@ -1,340 +1,474 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나는 어떤 아이스크림에 적합할까?</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>나는 어떤 아이스크림에 적합할까?</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    }
 
-        body {
-            background-color: #f7f7f8;
-            color: #333333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    body {
+      background-color: #fcfbf9; /* 따뜻한 느낌의 화이트 */
+      color: #333333; /* 짙은 회색 텍스트 */
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-            padding: 30px 24px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    /* 모바일 뷰포트 컨테이너 */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
 
-        /* ================================================= */
-        /* 📍 [로딩 화면 스타일]                              */
-        /* ================================================= */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
+    /* ================================================= */
+    /* 로딩 화면 (라이트 베이지 테마)                      */
+    /* ================================================= */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fcfbf9;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+      padding: 20px;
+    }
 
-        /* 📍 [로딩 화면 사진 크기 & 스타일] */
-        .loading-img {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 20px;
-            margin-bottom: 24px;
-        }
+    .loading-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c2c2c;
+      margin-bottom: 10px;
+      text-align: center;
+    }
 
-        /* 📍 [로딩 화면 글씨 스타일] */
-        .loading-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #222222;
-            margin-bottom: 10px;
-        }
+    .loading-sub {
+      font-size: 14px;
+      color: #8c8c8c;
+      margin-bottom: 30px;
+      text-align: center;
+    }
 
-        .loading-sub {
-            font-size: 14px;
-            color: #888888;
-            margin-bottom: 30px;
-        }
+    .loading-progress-bg {
+      width: 200px;
+      height: 6px;
+      background-color: #efebe7;
+      border-radius: 3px;
+      overflow: hidden;
+    }
 
-        /* 로딩 바 애니메이션 */
-        .progress-bar-container {
-            width: 200px;
-            height: 6px;
-            background-color: #f0f0f0;
-            border-radius: 3px;
-            overflow: hidden;
-        }
+    .loading-progress-fill {
+      width: 0%;
+      height: 100%;
+      background-color: #8c6d53;
+      animation: fillProgress 3s linear forwards;
+    }
 
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background-color: #555555;
-            animation: fillProgress 3s linear forwards;
-        }
+    @keyframes fillProgress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
 
-        @keyframes fillProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
+    /* ================================================= */
+    /* 상단 헤더 영역                                    */
+    /* ================================================= */
+    .header {
+      margin-bottom: 30px;
+    }
 
-        /* ================================================= */
-        /* 메인 콘텐츠 & 결과 화면                           */
-        /* ================================================= */
-        .page {
-            display: none;
-        }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      color: #8c8c8c;
+      font-size: 14px;
+    }
 
-        .page.active {
-            display: block;
-        }
+    .top-nav .title {
+      font-weight: 500;
+      color: #737373;
+    }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #222222;
-        }
+    .top-nav .title span {
+      color: #8c6d53; /* 포인트 브라운 */
+      font-weight: 700;
+      margin-right: 4px;
+    }
 
-        p {
-            font-size: 15px;
-            color: #666666;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background-color: #efebe7;
+      border-radius: 3px;
+      overflow: hidden;
+    }
 
-        .btn {
-            display: inline-block;
-            width: 100%;
-            padding: 16px;
-            background-color: #4a4a4a;
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: background-color 0.2s;
-        }
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background-color: #8c6d53;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
 
-        .btn:hover {
-            background-color: #333333;
-        }
+    /* 메인 영역 */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .question-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: #333333;
-        }
+    .page {
+      display: none;
+    }
 
-        .option-btn {
-            background-color: #f8f9fa;
-            color: #333333;
-            border: 1px solid #e9ecef;
-            text-align: left;
-        }
+    .page.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
 
-        .option-btn:hover {
-            background-color: #f1f3f5;
-        }
+    /* 시작 페이지 */
+    .start-title {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #2c2c2c;
+    }
 
-        .result-img {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
-    </style>
+    .start-desc {
+      font-size: 15px;
+      color: #737373;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    /* 메인 질문 영역 */
+    .question-title {
+      text-align: center;
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 32px;
+      color: #2c2c2c;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    /* 선택지 버튼 카드 */
+    .option-card {
+      background-color: #ffffff;
+      border: 1.5px solid #e8e3df;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      -webkit-tap-highlight-color: transparent;
+      text-align: left;
+    }
+
+    .option-card:active {
+      transform: scale(0.98);
+      border-color: #8c6d53;
+      background-color: #f7f4f0;
+    }
+
+    .option-badge {
+      background-color: #f2ebe5;
+      color: #6e543e;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 6px 11px;
+      border-radius: 8px;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .option-text {
+      font-size: 15px;
+      line-height: 1.55;
+      color: #4a4a4a;
+      word-break: keep-all;
+    }
+
+    /* 버튼 스타일 */
+    .main-btn {
+      width: 100%;
+      padding: 18px;
+      background-color: #8c6d53;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .main-btn:active {
+      background-color: #735740;
+    }
+
+    /* 결과 출력 스타일 */
+    .result-container {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .result-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #8c6d53;
+      margin-bottom: 20px;
+      word-break: keep-all;
+    }
+
+    .result-box {
+      background-color: #ffffff;
+      border: 1.5px solid #e8e3df;
+      border-radius: 16px;
+      padding: 24px 20px;
+      margin-bottom: 30px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .result-desc {
+      color: #4a4a4a;
+      font-size: 15px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- 📍 1번 수정위치: [로딩 화면 HTML] -->
-    <div id="loading-screen">
-        <img src="icecream.jpg" alt="로딩 이미지" class="loading-img">
-        <div class="loading-title">당신의 아이스크림을 쌓아 올리는 중...</div>
-        <div class="loading-sub">잠시만 기다려주세요!</div>
-        
-        <div class="progress-bar-container">
-            <div class="progress-bar-fill"></div>
-        </div>
+  <!-- [로딩 화면] -->
+  <div id="loading-screen">
+    <div class="loading-title">당신의 아이스크림을 쌓아 올리는 중...</div>
+    <div class="loading-sub">잠시만 기다려주세요!</div>
+    <div class="loading-progress-bg">
+      <div class="loading-progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- 상단 진행 상황 헤더 (질문 페이지에서만 보임) -->
+    <div class="header" id="header-area" style="visibility: hidden;">
+      <div class="top-nav">
+        <div class="title"><span>ICE CREAM</span> 성향 테스트</div>
+        <div id="step-counter">1/5</div>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="progress-bar" class="progress-bar-fill"></div>
+      </div>
     </div>
 
-    <div class="container">
-        <!-- 시작 페이지 -->
-        <div id="start-page" class="page active">
-            <h1>나의 아이스크림은</h1>
-            <p> 간단한 5가지 질문을 통해 알아보는<br>나의 아이스크림!</p>
-            <button class="btn" onclick="startTest()">테스트 시작하기</button>
-        </div>
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="content">
+      
+      <!-- 시작 페이지 -->
+      <div id="start-page" class="page active">
+        <h1 class="start-title">나의 아이스크림은</h1>
+        <p class="start-desc">간단한 5가지 질문을 통해 알아보는<br>나의 아이스크림!</p>
+        <button class="main-btn" onclick="startTest()">테스트 시작하기</button>
+      </div>
 
-        <!-- 질문 페이지 -->
-        <div id="question-page" class="page">
-            <div class="question-title" id="question-text">질문 내용</div>
-            <div id="options-container"></div>
-        </div>
+      <!-- 질문 페이지 -->
+      <div id="question-page" class="page">
+        <div class="question-title" id="question-text">질문 내용</div>
+        <div id="options-container"></div>
+      </div>
 
-        <!-- 결과 페이지 -->
-        <div id="result-page" class="page">
-            <h1 id="result-title">결과 타이틀</h1>
-            <!-- 💡 결과 이미지 태그 추가 (오류 수정 지점) -->
-            <img id="result-img" class="result-img" src="" alt="결과 이미지">
-            <p id="result-desc">결과 설명이 들어갑니다.</p>
-            <button class="btn" onclick="restartTest()">다시 테스트하기</button>
+      <!-- 결과 페이지 -->
+      <div id="result-page" class="page">
+        <div class="result-container">
+          <h2 class="result-title" id="result-title">결과 타이틀</h2>
+          <div class="result-box">
+            <p class="result-desc" id="result-desc">결과 설명이 들어갑니다.</p>
+          </div>
+          <button class="main-btn" onclick="restartTest()">다시 테스트하기</button>
         </div>
+      </div>
+
     </div>
+  </div>
 
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                const loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.style.opacity = '0';
-                setTimeout(function() {
-                    loadingScreen.style.display = 'none';
-                }, 500); // 서서히 사라지는 효과시간 (0.5초)
-            }, 3000); // 💡 3000 = 3초
-        });
+  <script>
+    // 로딩 화면 제어
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.style.opacity = '0';
+        setTimeout(function() {
+          loadingScreen.style.display = 'none';
+        }, 500);
+      }, 3000); // 3초 로딩
+    });
 
-        // 테스트 데이터 및 로직
-        const questions = [
-            {
-                q: "1. 주말에 석회동굴에 가게되었습니다. 이때 당신이 할 행동은?",
-                a: [
-                    { text: "어두운 동굴 깊은 곳에 무엇이 있는지 직접 끝까지 가봐야 직성이 풀린다.", type: "A" },
-                    { text: "동굴에서 방문할 동선을 미리 계획한다.", type: "B" },
-                    { text: "우선 같이 갈 일행을 구한 뒤, 무엇을 할지 맞춰본다.", type: "C" }
-                ]
-            },
-            {
-                q: "2. 동굴 안에서 어디에서도 보지 못한 특이한 돌을 발견했을때 당신은?",
-                a: [
-                    { text: "특이한 돌은 지나칠 수 없다! 돌을 관찰한다", type: "A" },
-                    { text: "특이한 돌이 신기하지만 계획에 없던 일이다! 가볍게 눈으로 훑은 뒤 갈길을 간다.", type: "B" },
-                    { text: "우선 돌을 관찰한 뒤, 일행에게 더 구경할 것인지 물어본다.", type: "C" }
-                ]
-            },
-            {
-                q: "3. 동굴 안에서 갈림길을 만났을때 당신은?",
-                a: [
-                    { text: "더 흥미로운 쪽으로 고른다.", type: "A" },
-                    { text: "이미 갈림길에서 어디로 갈지 계획해놓아 결정할 필요가 없다.", type: "B" },
-                    { text: "일행에게 의견을 물어 어디로 갈지 결정해본다.", type: "C" }
-                ]
-            },
-            {
-                q: "4. 동굴에서 일행이 다른 곳을 보러가자고 하지만 당신은 현재 있는 곳이 마음에 듭니다. 이때 당신은?",
-                a: [
-                    { text: "여기가 마음에 든다며 조금만 더 보고 가자고 말해본다.", type: "A" },
-                    { text: "동굴의 경로를 확인하고 알겠다고 말한다.", type: "B" },
-                    { text: "이 곳이 마음에 들지만 일행이 가고싶은 곳도 좋을 것 같다! 흔쾌히 수락한다.", type: "C" }
-                ]
-            },
-            {
-                q: "5. 석회동굴에서 딱 한 장의 사진만 남길 수 있다면?",
-                a: [
-                    { text: "오늘 관람하며 가장 마음에 들었던 돌을 고른다.", type: "A" },
-                    { text: "이미 가장 마음에 드는 돌을 골라놓아 어디서 찍을지 쉽게 결정한다.", type: "B" },
-                    { text: "하나의 특이한 돌 보다 여러개의 돌이 함께있는 곳을 결정한다.", type: "C" }
-                ]
-            }
-        ];
+    // 질문 및 선택지 데이터
+    const questions = [
+      {
+        q: "1. 주말에 석회동굴에 가게되었습니다. 이때 당신이 할 행동은?",
+        a: [
+          { text: "어두운 동굴 깊은 곳에 무엇이 있는지 직접 끝까지 가봐야 직성이 풀린다.", type: "A" },
+          { text: "동굴에서 방문할 동선을 미리 계획한다.", type: "B" },
+          { text: "우선 같이 갈 일행을 구한 뒤, 무엇을 할지 맞춰본다.", type: "C" }
+        ]
+      },
+      {
+        q: "2. 동굴 안에서 어디에서도 보지 못한 특이한 돌을 발견했을때 당신은?",
+        a: [
+          { text: "특이한 돌은 지나칠 수 없다! 돌을 관찰한다.", type: "A" },
+          { text: "특이한 돌이 신기하지만 계획에 없던 일이다! 가볍게 눈으로 훑은 뒤 갈길을 간다.", type: "B" },
+          { text: "우선 돌을 관찰한 뒤, 일행에게 더 구경할 것인지 물어본다.", type: "C" }
+        ]
+      },
+      {
+        q: "3. 동굴 안에서 갈림길을 만났을때 당신은?",
+        a: [
+          { text: "더 흥미로운 쪽으로 고른다.", type: "A" },
+          { text: "이미 갈림길에서 어디로 갈지 계획해놓아 결정할 필요가 없다.", type: "B" },
+          { text: "일행에게 의견을 물어 어디로 갈지 결정해본다.", type: "C" }
+        ]
+      },
+      {
+        q: "4. 동굴에서 일행이 다른 곳을 보러가자고 하지만 당신은 현재 있는 곳이 마음에 듭니다. 이때 당신은?",
+        a: [
+          { text: "여기가 마음에 든다며 조금만 더 보고 가자고 말해본다.", type: "A" },
+          { text: "동굴의 경로를 확인하고 알겠다고 말한다.", type: "B" },
+          { text: "이 곳이 마음에 들지만 일행이 가고싶은 곳도 좋을 것 같다! 흔쾌히 수락한다.", type: "C" }
+        ]
+      },
+      {
+        q: "5. 석회동굴에서 딱 한 장의 사진만 남길 수 있다면?",
+        a: [
+          { text: "오늘 관람하며 가장 마음에 들었던 돌을 고른다.", type: "A" },
+          { text: "이미 가장 마음에 드는 돌을 골라놓아 어디서 찍을지 쉽게 결정한다.", type: "B" },
+          { text: "하나의 특이한 돌 보다 여러개의 돌이 함께있는 곳을 결정한다.", type: "C" }
+        ]
+      }
+    ];
 
-        const results = {
-            A: {
-                title: "당신의 아이스크림은 초코맛 종유석",
-                desc: "뾰족뾰족한 종유석과 같이 당신은 새로운 일에 망설임 없이 도전하는 편입니다. 호기심이 많고 과감하게 행동하는것에 거침없습니다.",
-                img: "result1.png"
-            },
-            B: {
-                title: "당신의 아이스크림은 흑임자맛 석순",
-                desc: "동굴 바닥의 바위나 흙에서 차곡차곡 자라나는 석순처럼 당신은 신중하고 꾸준한 성격을 가진편입니다. 서두르기보다는 차근차근 해내가며 자신의 속도대로 목표를 달성합니다.",
-                img: "result2.png"
-            },
-            C: {
-                title: "당신의 아이스크림은 얼그레이맛 석주",
-                desc: "위와 아래가 만나 하나의 기둥이 된 석주와 같이 당신은 균형과 조화를 중요하게 생각하는 편입니다. 자신의 의견을 소신있게 밀어가면서도 다른 사람의 의견 또한 존중하며 다양한 의견을 수용하려 노력합니다.",
-                img: "result3.png"
-            }
-        };
+    // 결과 데이터
+    const results = {
+      A: {
+        title: "당신의 아이스크림은 초코맛 종유석",
+        desc: "뾰족뾰족한 종유석과 같이 당신은 새로운 일에 망설임 없이 도전하는 편입니다. 호기심이 많고 과감하게 행동하는것에 거침없습니다."
+      },
+      B: {
+        title: "당신의 아이스크림은 흑임자맛 석순",
+        desc: "동굴 바닥의 바위나 흙에서 차곡차곡 자라나는 석순처럼 당신은 신중하고 꾸준한 성격을 가진편입니다. 서두르기보다는 차근차근 해내가며 자신의 속도대로 목표를 달성합니다."
+      },
+      C: {
+        title: "당신의 아이스크림은 얼그레이맛 석주",
+        desc: "위와 아래가 만나 하나의 기둥이 된 석주와 같이 당신은 균형과 조화를 중요하게 생각하는 편입니다. 자신의 의견을 소신있게 밀어가면서도 다른 사람의 의견 또한 존중하며 다양한 의견을 수용하려 노력합니다."
+      }
+    };
 
-        let currentQ = 0;
-        let scores = { A: 0, B: 0, C: 0 };
+    let currentQ = 0;
+    let scores = { A: 0, B: 0, C: 0 };
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
 
-        function startTest() {
-            currentQ = 0;
-            scores = { A: 0, B: 0, C: 0 };
-            showPage('question-page');
-            renderQuestion();
-        }
+      const headerArea = document.getElementById('header-area');
+      if (pageId === 'question-page') {
+        headerArea.style.visibility = 'visible';
+      } else {
+        headerArea.style.visibility = 'hidden';
+      }
+    }
 
-        function renderQuestion() {
-            const qData = questions[currentQ];
-            document.getElementById('question-text').innerText = qData.q;
-            
-            const optionsBox = document.getElementById('options-container');
-            optionsBox.innerHTML = '';
+    function startTest() {
+      currentQ = 0;
+      scores = { A: 0, B: 0, C: 0 };
+      showPage('question-page');
+      renderQuestion();
+    }
 
-            qData.a.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'btn option-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => selectOption(opt.type);
-                optionsBox.appendChild(btn);
-            });
-        }
+    function renderQuestion() {
+      const qData = questions[currentQ];
+      document.getElementById('question-text').innerText = qData.q;
+      
+      // 진행률 및 카운터 업데이트
+      document.getElementById('step-counter').innerText = `${currentQ + 1}/${questions.length}`;
+      const progressPercent = ((currentQ + 1) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 
-        function selectOption(type) {
-            scores[type]++;
-            currentQ++;
+      const optionsBox = document.getElementById('options-container');
+      optionsBox.innerHTML = '';
 
-            if (currentQ < questions.length) {
-                renderQuestion();
-            } else {
-                showResult();
-            }
-        }
+      const labels = ['A', 'B', 'C', 'D'];
+      qData.a.forEach((opt, idx) => {
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.onclick = () => selectOption(opt.type);
 
-        function showResult() {
-            let maxType = 'A';
-            if (scores.B > scores[maxType]) maxType = 'B';
-            if (scores.C > scores[maxType]) maxType = 'C';
+        const badge = document.createElement('div');
+        badge.className = 'option-badge';
+        badge.innerText = labels[idx] || (idx + 1);
 
-            const res = results[maxType];
-            document.getElementById('result-title').innerText = res.title;
-            document.getElementById('result-desc').innerText = res.desc;
-            document.getElementById('result-img').src = res.img;
+        const text = document.createElement('div');
+        text.className = 'option-text';
+        text.innerText = opt.text;
 
-            showPage('result-page');
-        }
+        card.appendChild(badge);
+        card.appendChild(text);
+        optionsBox.appendChild(card);
+      });
+    }
 
-        function restartTest() {
-            showPage('start-page');
-        }
-    </script>
+    function selectOption(type) {
+      scores[type]++;
+      currentQ++;
+
+      if (currentQ < questions.length) {
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      let maxType = 'A';
+      if (scores.B > scores[maxType]) maxType = 'B';
+      if (scores.C > scores[maxType]) maxType = 'C';
+
+      const res = results[maxType];
+      document.getElementById('result-title').innerText = res.title;
+      document.getElementById('result-desc').innerText = res.desc;
+
+      showPage('result-page');
+    }
+
+    function restartTest() {
+      showPage('start-page');
+    }
+  </script>
 </body>
 </html>
